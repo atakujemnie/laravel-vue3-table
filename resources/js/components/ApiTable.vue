@@ -1,36 +1,50 @@
 <template>
     <div class="container mx-auto p-4">
-        <input type="text" v-model="searchTerm" @input="fetchData" class="mb-4 p-2 border border-gray-300 rounded"
-            placeholder="Search..." />
-        <div class="flex justify-end mb-4">
-            <label class="mr-2">Products per page:</label>
-            <select v-model="perPage" @change="fetchData" class="p-2 border border-gray-300 rounded">
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-            </select>
+        <div class="flex justify-between items-center mb-4">
+            <input type="text" v-model="searchTerm" @input="fetchData"
+                class="p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
+                placeholder="Search..." />
+            <div>
+                <label class="mr-2">Products per page:</label>
+                <select v-model="perPage" @change="fetchData"
+                    class="pt-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-200">
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
         </div>
-        <table class="min-w-full border-collapse block md:table">
-            <thead class="block md:table-header-group">
-                <tr class="border border-gray-300 md:border-none block md:table-row">
+
+        <table class="min-w-full bg-white shadow-md rounded-md overflow-hidden">
+            <thead class="bg-gradient-to-r from-gray-300 to-gray-200">
+                <tr class="uppercase text-sm leading-normal text-gray-700">
                     <th v-for="column in columns" :key="column.name" @click="column.sortable ? sortBy(column) : null"
-                        class="bg-gray-100 p-2 border border-gray-300 md:border-none block md:table-cell cursor-pointer"
-                        :class="{ 'text-blue-500': sortColumn === column.name }">
+                        class="py-3 px-6 text-left font-semibold cursor-pointer">
                         {{ column.label }}
-                        <span v-if="column.sortable">
-                            <i v-if="sortColumn === column.name && sortDirection === 'asc'" class="fas fa-arrow-up"></i>
-                            <i v-if="sortColumn === column.name && sortDirection === 'desc'" class="fas fa-arrow-down"></i>
+                        <span v-if="column.sortable" class="ml-2">
+                            <svg v-if="sortColumn === column.name" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline">
+                                <path v-if="sortDirection === 'asc'" stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+                                <path v-else stroke-linecap="round" stroke-linejoin="round"
+                                    d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                            </svg>
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
+                            </svg>
                         </span>
                     </th>
                 </tr>
             </thead>
-            <tbody class="block md:table-row-group">
-                <tr v-for="item in data" :key="item.id" class="border border-gray-300 md:border-none block md:table-row">
-                    <td v-for="column in columns" :key="column.name"
-                        class="p-2 border border-gray-300 md:border-none block md:table-cell">
-                        <div v-if="column.content">
-                            <div v-html="column.content(item)"></div>
+            <tbody>
+                <tr v-for="item in data" :key="item.id"
+                    :class="{ 'bg-gray-50': data.indexOf(item) % 2 === 0, 'hover:bg-gray-200': true, 'rounded-lg': true, 'text-gray-600': true }">
+                    <td v-for="column in columns" :key="column.name" class="py-3 px-6">
+                        <div v-if="column.additional">
+                            <slot name="column-extra" :column="column" :item="item"></slot>
                         </div>
                         <div v-else>
                             {{ item[column.name] }}
@@ -42,18 +56,18 @@
 
         <div class="flex justify-between items-center mt-4">
             <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1"
-                class="px-4 py-2 bg-gray-300 text-white font-bold rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="px-4 py-2 bg-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed">
                 Prev
             </button>
-            <span>Page {{ currentPage }} of {{ totalPages }}</span>
+            <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
             <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages"
-                class="px-4 py-2 bg-gray-500 text-white font-bold rounded hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="px-4 py-2 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
                 Next
             </button>
         </div>
     </div>
 </template>
-  
+
 <script>
 import axios from 'axios';
 
@@ -77,7 +91,6 @@ export default {
             searchTerm: '',
             sortColumn: '',
             sortDirection: 'asc',
-            additionalParams: {},
             perPage: 15,
         };
     },
@@ -121,8 +134,4 @@ export default {
     }
 };
 </script>
-  
-<style>
-/* Tu możesz dodać dodatkowe style Tailwind CSS */
-</style>
-  
+
