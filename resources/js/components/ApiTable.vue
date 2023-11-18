@@ -2,7 +2,15 @@
     <div class="container mx-auto p-4">
         <input type="text" v-model="searchTerm" @input="fetchData" class="mb-4 p-2 border border-gray-300 rounded"
             placeholder="Search..." />
-
+        <div class="flex justify-end mb-4">
+            <label class="mr-2">Products per page:</label>
+            <select v-model="perPage" @change="fetchData" class="p-2 border border-gray-300 rounded">
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+            </select>
+        </div>
         <table class="min-w-full border-collapse block md:table">
             <thead class="block md:table-header-group">
                 <tr class="border border-gray-300 md:border-none block md:table-row">
@@ -54,6 +62,10 @@ export default {
         apiUrl: {
             type: String,
             required: true
+        },
+        additionalParams: {
+            type: Object,
+            default: () => ({})
         }
     },
     data() {
@@ -64,7 +76,9 @@ export default {
             totalPages: 0,
             searchTerm: '',
             sortColumn: '',
-            sortDirection: 'asc'
+            sortDirection: 'asc',
+            additionalParams: {},
+            perPage: 15,
         };
     },
     methods: {
@@ -73,7 +87,9 @@ export default {
                 page: this.currentPage,
                 searchTerm: this.searchTerm,
                 sortColumn: this.sortColumn,
-                sortDirection: this.sortDirection
+                sortDirection: this.sortDirection,
+                perPage: this.perPage,
+                ...this.additionalParams
             };
             axios.get(this.apiUrl, { params })
                 .then(response => {
