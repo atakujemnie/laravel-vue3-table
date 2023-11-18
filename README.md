@@ -32,16 +32,16 @@ Use the ApiTable component in your Vue templates:
 
 ```vue
 <template>
-  <api-table :columns="columns" :data-url="'/api/data'"></api-table>
+  <ApiTable :apiUrl="'http://yourdomain.com/api/datatable'" />
 </template>
 
 <script>
+import ApiTable from '@/Components/Tables/ApiTable.vue';
+
 export default {
-  data() {
-    return {
-      columns: [...]
-    };
-  },
+    components: {
+        ApiTable,
+    },
 };
 </script>
 ```
