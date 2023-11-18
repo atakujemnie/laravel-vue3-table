@@ -3,7 +3,6 @@
 namespace Atakujemnie\LaravelVue3Table\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 class MakeTableCommand extends Command
 {
@@ -21,9 +20,11 @@ class MakeTableCommand extends Command
 
         namespace App\Tables;
 
-        use App\Models\'$model;
+        use App\Models\$model;
         use Illuminate\Database\Eloquent\Builder;
         use Illuminate\Http\Request;
+        use Atakujemnie\LaravelVue3Table\TableService;
+
 
         class $name extends TableService
         {

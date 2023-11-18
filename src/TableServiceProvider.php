@@ -5,6 +5,7 @@ namespace Atakujemnie\LaravelVue3Table;
 use Illuminate\Support\ServiceProvider;
 use Atakujemnie\LaravelVue3Table\Console\Commands\MakeTableCommand;
 use Atakujemnie\LaravelVue3Table\Console\Commands\CopyVueComponentCommand;
+use Atakujemnie\LaravelVue3Table\TableService;
 
 class TableServiceProvider extends ServiceProvider
 {
@@ -35,6 +36,8 @@ class TableServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Tutaj możesz zarejestrować dowolne usługi, jeśli są potrzebne
+        $this->app->singleton(TableService::class, function ($app) {
+            return new TableService();
+        });
     }
 }
