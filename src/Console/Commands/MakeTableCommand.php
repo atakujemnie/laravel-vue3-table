@@ -21,7 +21,7 @@ class MakeTableCommand extends Command
 
         namespace App\Tables;
 
-        use $model;
+        use App\Models\'$model;
         use Illuminate\Database\Eloquent\Builder;
         use Illuminate\Http\Request;
 
