@@ -1,0 +1,30 @@
+{
+    "name": "atakujemnie/laravel-vue3-table",
+    "description": "\"A versatile Laravel and Vue.js 3 package for efficiently creating and managing interactive data tables. This package seamlessly integrates Vue.js components with Laravel's backend, providing a dynamic and responsive user experience. It offers customizable table columns, sorting, searching, pagination, and the ability to include custom query conditions, making it ideal for diverse data presentation and manipulation needs in modern web applications.\"",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Atakujemnie\\LaravelVue3Table\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Atakujemnie\\LaravelVue3Table\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "adrian.hojny",
+            "email": "hojny.adrian@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1",
+        "laravel/framework": "^10.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.15"
+    }
+}
