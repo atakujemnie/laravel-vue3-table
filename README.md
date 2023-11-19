@@ -22,7 +22,29 @@ Install the package via composer:
 composer require atakujemnie/laravel-vue3-table
 ```
 ## Usage
-### Using Backend-Only Functionality
+
+### Simple Usage
+After adding the package to your application, you can easily set up a table by running the following command:
+```bash
+php artisan make:table MyCustomTable MyModel
+```
+In this command:
+
+* MyCustomTable is the name of the class responsible for loading table data from the backend.
+* MyModel is your Laravel model from which the data will be sourced. By default, the model path is set to App/Models.
+This command will create a new "Tables" folder in the App directory with your custom table class. This class includes a basic method that allows you to load your model into the table.
+
+To utilize your table data, you might do something like this:
+
+``` bash
+$tableModel = new MyCustomTable();
+$tableData = $tableModel->getTableData($request);
+return response()->json($tableData);
+```
+
+Remember, the table relies on Illuminate\Http\Request data for passing parameters such as pagination, etc. The data you receive can be directly connected to the Table component described below.
+
+### Using Frontend Functionality
 If your application does not include views, you can utilize only the backend functionalities of this package. However, if you wish to use the table component in your views, follow the steps below:
 
 Publishing Vue.js Components
@@ -49,12 +71,6 @@ export default {
 </script>
 ```
 
-
-Create a new table class in Laravel:
-```bash
-php artisan make:table MyCustomTable
-```
-Define your table logic in app/Tables/MyCustomTable.php.
 
 ## Contributing
 Contributions are welcome and will be fully credited. Please see CONTRIBUTING for details.
