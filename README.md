@@ -57,7 +57,7 @@ This command will create a LaravelVueTable folder within your Components directo
 
 ```vue
 <template>
-  <Table :apiUrl="'http://yourdomain.com/api/datatable'" />
+  <Table :apiUrl="'http://yourdomain.com/api/data-for-table'" />
 </template>
 
 <script>
@@ -70,7 +70,147 @@ export default {
 };
 </script>
 ```
+---
+## Extending TableService for Custom Model Tables
 
+When creating custom tables for your models using the `TableService`, there are several methods you can override to customize the table's behavior and appearance. Below are the methods you can extend:
+
+### `setModel()`
+Define the model that the table will be displaying. This method is used to set the `$model` property with an instance of the model.
+
+```php
+protected function setModel(): void
+{
+    $this->model = new YourModel();
+}
+```
+### setRelations()
+Specify any model relationships that should be included when querying the table data.
+
+```php
+protected function setRelations(): void
+{
+    $this->relations = ['relationName'];
+}
+```
+### setSearchable()
+Determine which columns can be searched. This method sets the $searchable array with the names of the columns.
+
+```php
+protected function setSearchable(): void
+{
+    $this->searchable = ['column1', 'column2'];
+}
+```
+### setSortable()
+Define which columns can be sorted. This method sets the $sortable array with the names of the sortable columns.
+
+```php
+protected function setSortable(): void
+{
+    $this->sortable = ['column1', 'column2'];
+}
+```
+
+### setExcludedColumns()
+
+```php
+protected function setExcludedColumns(): void
+{
+    $this->excludedColumns = ['column1', 'column2'];
+}
+```
+### setHiddenColumns()
+Hide specific columns from the table output. This method sets the $hiddenColumns array.
+
+```php
+protected function setHiddenColumns(): void
+{
+    $this->hiddenColumns = ['column1', 'column2'];
+}
+```
+
+### setColumnOrder()
+Determine the order in which columns appear in the table. This method sets the $columnOrder array.
+
+```php
+protected function setColumnOrder(): void
+{
+    $this->columnOrder = ['column1', 'column2'];
+}
+```
+--------------
+### applyCustomQueryConditions(Builder $query, Request $request)
+Apply custom conditions to the table query. This method allows you to modify the Eloquent query builder instance with additional conditions.
+
+``` php
+protected function applyCustomQueryConditions(Builder $query, Request $request): void
+{
+    $query->where('status',1);
+}
+``` 
+
+## Custom Table Columns
+
+### Creating Custom Columns
+
+To enhance the functionality of your tables with custom columns, you can define additional data that goes beyond the default model attributes. These custom columns can be used to display computed values, aggregate information, or options like edit links.
+
+Here's how you can define custom columns in your `TableService` subclass:
+
+```php
+protected function getAdditionalColumns(): void
+{
+    $this->additionalColumns = [
+        [
+            'name' => 'eans',
+            'label' => 'EANs',
+            'sortable' => false,
+            'searchable' => false,
+            'additional' => true,
+            'contentQuery' => [$this, 'getEANsForProduct']
+        ],
+        [
+            'name' => 'edit',
+            'label' => 'Edit',
+            'sortable' => false,
+            'searchable' => false,
+            'additional' => true
+        ],
+        // Add more custom columns as needed
+    ];
+}
+```
+
+## Implementing Content Queries
+For each custom column that requires additional data from the backend, you should implement a corresponding method that retrieves this data. Here's an example for the eans custom column:
+
+```php
+protected function getEANsForProduct($productId)
+{
+    $product = Product::find($productId);
+    return $product ? $product->variants->pluck('ean') : null;
+}
+```
+
+Displaying Custom Columns in the Frontend
+In your frontend Vue.js component, you can utilize slots to render the content of custom columns. Below is an example of how you could display the eans and edit custom columns:
+
+```vue
+<template v-slot:column-extra="{ column, item }">
+    <div v-if="column.name === 'edit'">
+        <a :href="'/edit/' + item.id">Edit</a>
+    </div>
+    <div v-if="column.name === 'eans'">
+        <span v-for="ean in item.eans" :key="ean">{{ ean }}</span>
+    </div>
+</template>
+```
+
+Make sure to use the correct column names and data properties that match your backend configuration.
+
+Conclusion
+Custom columns allow for a highly flexible and dynamic table that can fit the unique needs of your application. With custom content queries and the power of Vue.js slots, you can easily add and display any type of data in your tables.
 
 ## Contributing
 Contributions are welcome and will be fully credited. Please see CONTRIBUTING for details.
