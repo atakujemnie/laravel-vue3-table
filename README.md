@@ -22,34 +22,55 @@ Install the package via composer:
 composer require atakujemnie/laravel-vue3-table
 ```
 ## Usage
-Publish the Vue component:
-```bash
-php artisan make:vue-component
-```
-Add the Vue component to your Vue application.
 
-Use the ApiTable component in your Vue templates:
+### Simple Usage
+After adding the package to your application, you can easily set up a table by running the following command:
+```bash
+php artisan make:table MyCustomTable MyModel
+```
+In this command:
+
+* MyCustomTable is the name of the class responsible for loading table data from the backend.
+* MyModel is your Laravel model from which the data will be sourced. By default, the model path is set to App/Models.
+This command will create a new "Tables" folder in the App directory with your custom table class. This class includes a basic method that allows you to load your model into the table.
+
+To utilize your table data, you might do something like this:
+
+``` bash
+$tableModel = new MyCustomTable();
+$tableData = $tableModel->getTableData($request);
+return response()->json($tableData);
+```
+
+Remember, the table relies on Illuminate\Http\Request data for passing parameters such as pagination, etc. The data you receive can be directly connected to the Table component described below.
+
+### Using Frontend Functionality
+If your application does not include views, you can utilize only the backend functionalities of this package. However, if you wish to use the table component in your views, follow the steps below:
+
+Publishing Vue.js Components
+To use the table component within your views, you need to publish the Vue.js components from this package to your application. Run the following command:
+
+```bash
+php artisan vendor:publish --tag=laravel-vue3-table-components
+```
+This command will create a LaravelVueTable folder within your Components directory, containing the Table component and its associated elements. Now, you are ready to integrate the Table component into your application views.
 
 ```vue
 <template>
-  <ApiTable :apiUrl="'http://yourdomain.com/api/datatable'" />
+  <Table :apiUrl="'http://yourdomain.com/api/datatable'" />
 </template>
 
 <script>
-import ApiTable from '@/Components/Tables/ApiTable.vue';
+import Table from '@/Components/LaravelVueTable/Table.vue';
 
 export default {
     components: {
-        ApiTable,
+        Table,
     },
 };
 </script>
 ```
-Create a new table class in Laravel:
-```bash
-php artisan make:table MyCustomTable
-```
-Define your table logic in app/Tables/MyCustomTable.php.
+
 
 ## Contributing
 Contributions are welcome and will be fully credited. Please see CONTRIBUTING for details.
