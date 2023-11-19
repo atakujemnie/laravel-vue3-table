@@ -22,29 +22,34 @@ Install the package via composer:
 composer require atakujemnie/laravel-vue3-table
 ```
 ## Usage
-Publish the Vue component:
-```bash
-php artisan make:vue-component
-```
-Add the Vue component to your Vue application.
+### Using Backend-Only Functionality
+If your application does not include views, you can utilize only the backend functionalities of this package. However, if you wish to use the table component in your views, follow the steps below:
 
-Use the ApiTable component in your Vue templates:
+Publishing Vue.js Components
+To use the table component within your views, you need to publish the Vue.js components from this package to your application. Run the following command:
+
+```bash
+php artisan vendor:publish --tag=laravel-vue3-table-components
+```
+This command will create a LaravelVueTable folder within your Components directory, containing the Table component and its associated elements. Now, you are ready to integrate the Table component into your application views.
 
 ```vue
 <template>
-  <ApiTable :apiUrl="'http://yourdomain.com/api/datatable'" />
+  <Table :apiUrl="'http://yourdomain.com/api/datatable'" />
 </template>
 
 <script>
-import ApiTable from '@/Components/Tables/ApiTable.vue';
+import Table from '@/Components/LaravelVueTable/Table.vue';
 
 export default {
     components: {
-        ApiTable,
+        Table,
     },
 };
 </script>
 ```
+
+
 Create a new table class in Laravel:
 ```bash
 php artisan make:table MyCustomTable
