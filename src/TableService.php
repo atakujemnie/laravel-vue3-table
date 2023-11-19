@@ -5,7 +5,6 @@ namespace Atakujemnie\LaravelVue3Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Schema;
 
 abstract class TableService
 {
@@ -20,7 +19,6 @@ abstract class TableService
     protected array $additionalColumns = [];
     protected array $hiddenColumns = [];
     protected array $columnOrder = [];
-
 
     abstract protected function setModel(): void;
 
@@ -56,17 +54,13 @@ abstract class TableService
     {
         // Opcjonalna implementacja w klasie dziedziczącej
     }
-    protected function getColumnConfiguration(string $columnName): ?array
-    {
-        return null;
-    }
 
-    protected function getAdditionalColumns(): void
+    protected function setDefaultSorting(): void
     {
         // Opcjonalna implementacja w klasie dziedziczącej
     }
 
-    protected function setDefaultSorting(): void
+    protected function getAdditionalColumns(): void
     {
         // Opcjonalna implementacja w klasie dziedziczącej
     }
@@ -88,69 +82,17 @@ abstract class TableService
 
     protected function initializeColumns(): void
     {
-        $this->setColumnOrder();
-        $allColumns = [];
+        $columnService = new ColumnService($this->model, [
+            'relations' => $this->relations,
+            'additionalColumns' => $this->additionalColumns,
+            'hiddenColumns' => $this->hiddenColumns,
+            'excludedColumns' => $this->excludedColumns,
+            'sortable' => $this->sortable,
+            'searchable' => $this->searchable,
+            'columnOrder' => $this->columnOrder,
+        ]);
 
-        foreach ($this->columnOrder as $columnName) {
-            if (!in_array($columnName, $this->hiddenColumns)) {
-                $customConfig = $this->getColumnConfiguration($columnName) ?? [];
-                $additionalConfig = $this->findInAdditionalColumns($columnName) ?? []; // Szukaj w dodatkowych kolumnach
-
-                $allColumns[$columnName] = array_merge([
-                    'name' => $columnName,
-                    'label' => ucfirst($columnName),
-                    'sortable' => in_array($columnName, $this->sortable),
-                    'searchable' => in_array($columnName, $this->searchable)
-                ], $customConfig, $additionalConfig); // Scalanie z dodatkową konfiguracją
-            }
-        }
-
-        // Dodaj kolumny z modelu
-        $fillable = array_diff($this->model->getFillable(), $this->excludedColumns, $this->hiddenColumns, array_keys($allColumns));
-        foreach ($fillable as $column) {
-            $defaultColumnConfig = [
-                'name' => $column,
-                'label' => ucfirst($column),
-                'sortable' => in_array($column, $this->sortable, false),
-                'searchable' => in_array($column, $this->searchable, false)
-            ];
-
-            $customConfig = $this->getColumnConfiguration($column);
-            $allColumns[$column] = $customConfig ? array_merge($defaultColumnConfig, $customConfig) : $defaultColumnConfig;
-        }
-
-        // Dodaj kolumny relacji
-        foreach ($this->relations as $relation) {
-            if (!array_key_exists($relation, $allColumns)) {
-                $allColumns[$relation] = [
-                    'name' => $relation,
-                    'label' => ucfirst($relation),
-                    'sortable' => false,
-                    'searchable' => false,
-                    'relation' => true
-                ];
-            }
-        }
-
-        // Dodaj dodatkowe kolumny
-        foreach ($this->additionalColumns as $additionalColumn) {
-            if (!array_key_exists($additionalColumn['name'], $allColumns)) {
-                $allColumns[] = $additionalColumn;
-            }
-        }
-
-        // Przypisz wszystkie kolumny do $this->columns
-        $this->columns = array_values($allColumns);
-    }
-
-    protected function findInAdditionalColumns(string $columnName): ?array
-    {
-        foreach ($this->additionalColumns as $additionalColumn) {
-            if ($additionalColumn['name'] === $columnName) {
-                return $additionalColumn;
-            }
-        }
-        return null;
+        $this->columns = $columnService->initializeColumns();
     }
 
     public function getTableData(Request $request): array
@@ -178,7 +120,6 @@ abstract class TableService
         ];
     }
 
-
     protected function buildQuery(Request $request): Builder
     {
         $columnsToLoad = array_diff($this->model->getFillable(), $this->excludedColumns);
@@ -191,7 +132,6 @@ abstract class TableService
 
         return $query;
     }
-
 
     protected function pagination(Builder $query, Request $request)
     {
@@ -218,6 +158,7 @@ abstract class TableService
         $searchQuery = new Queries\SearchQuery($this->searchable);
         $searchQuery->apply($query, $request);
     }
+
     protected function applyRelations(Builder $query): void
     {
         $relationQuery = new Queries\RelationQuery($this->relations);
