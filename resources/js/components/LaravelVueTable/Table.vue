@@ -106,7 +106,6 @@ export default {
     },
     computed: {
         visibleColumnsArray() {
-            // Upewnij się, że columns istnieje zanim użyjesz go w obliczeniach
             if (!this.columns) {
                 return [];
             }
@@ -118,7 +117,6 @@ export default {
             return visible;
         },
         hiddenColumns() {
-            // Upewnij się, że columns istnieje zanim użyjesz go w obliczeniach
             if (!this.columns) {
                 return [];
             }
