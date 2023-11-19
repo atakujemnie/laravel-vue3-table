@@ -22,7 +22,8 @@
                     <th v-for="column in columns" :key="column.name" @click="column.sortable ? sortBy(column) : null"
                         class="py-3 px-6 text-left font-semibold cursor-pointer">
                         {{ column.label }}
-                        <TableSortIcon :isSorted="sortColumn === column.name" :sortDirection="sortDirection" />
+                        <TableSortIcon v-if="column.sortable" :isSorted="sortColumn === column.name"
+                            :sortDirection="sortDirection" />
                     </th>
                 </tr>
             </thead>

@@ -92,14 +92,16 @@ abstract class TableService
         $allColumns = [];
 
         foreach ($this->columnOrder as $columnName) {
-            if (!in_array($columnName, $this->hiddenColumns) && !isset($allColumns[$columnName])) {
+            if (!in_array($columnName, $this->hiddenColumns)) {
                 $customConfig = $this->getColumnConfiguration($columnName) ?? [];
+                $additionalConfig = $this->findInAdditionalColumns($columnName) ?? []; // Szukaj w dodatkowych kolumnach
+
                 $allColumns[$columnName] = array_merge([
                     'name' => $columnName,
                     'label' => ucfirst($columnName),
                     'sortable' => in_array($columnName, $this->sortable),
                     'searchable' => in_array($columnName, $this->searchable)
-                ], $customConfig);
+                ], $customConfig, $additionalConfig); // Scalanie z dodatkową konfiguracją
             }
         }
 
@@ -141,13 +143,33 @@ abstract class TableService
         $this->columns = array_values($allColumns);
     }
 
+    protected function findInAdditionalColumns(string $columnName): ?array
+    {
+        foreach ($this->additionalColumns as $additionalColumn) {
+            if ($additionalColumn['name'] === $columnName) {
+                return $additionalColumn;
+            }
+        }
+        return null;
+    }
 
     public function getTableData(Request $request): array
     {
         $query = $this->buildQuery($request);
         $data = $this->pagination($query, $request);
+
+        $items = collect($data->items())->map(function ($item) {
+            foreach ($this->additionalColumns as $additionalColumn) {
+                if (isset($additionalColumn['contentQuery'])) {
+                    $method = $additionalColumn['contentQuery'];
+                    $item->{$additionalColumn['name']} = call_user_func($method, $item->id);
+                }
+            }
+            return $item;
+        });
+
         return [
-            'data' => $data->items(),
+            'data' => $items,
             'columns' => array_values($this->columns),
             'pagination' => [
                 'current_page' => $data->currentPage(),
@@ -156,19 +178,20 @@ abstract class TableService
         ];
     }
 
+
     protected function buildQuery(Request $request): Builder
     {
         $columnsToLoad = array_diff($this->model->getFillable(), $this->excludedColumns);
 
         $query = $this->model::select($columnsToLoad);
         $this->applyCustomQueryConditions($query, $request);
-
         $this->applySorting($query, $request);
         $this->applySearch($query, $request);
         $this->applyRelations($query);
 
         return $query;
     }
+
 
     protected function pagination(Builder $query, Request $request)
     {
@@ -183,8 +206,6 @@ abstract class TableService
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
-
-
 
     protected function applySorting(Builder $query, Request $request): void
     {
