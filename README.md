@@ -57,7 +57,7 @@ This command will create a LaravelVueTable folder within your Components directo
 
 ```vue
 <template>
-  <Table :apiUrl="'http://yourdomain.com/api/datatable'" />
+  <Table :apiUrl="'http://yourdomain.com/api/data-for-table'" />
 </template>
 
 <script>
@@ -101,7 +101,7 @@ protected function getAdditionalColumns(): void
         // Add more custom columns as needed
     ];
 }
-
+```
 
 ## Implementing Content Queries
 For each custom column that requires additional data from the backend, you should implement a corresponding method that retrieves this data. Here's an example for the eans custom column:
