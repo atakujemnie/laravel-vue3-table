@@ -70,6 +70,85 @@ export default {
 };
 </script>
 ```
+---
+## Extending TableService for Custom Model Tables
+
+When creating custom tables for your models using the `TableService`, there are several methods you can override to customize the table's behavior and appearance. Below are the methods you can extend:
+
+### `setModel()`
+Define the model that the table will be displaying. This method is used to set the `$model` property with an instance of the model.
+
+```php
+protected function setModel(): void
+{
+    $this->model = new YourModel();
+}
+```
+### setRelations()
+Specify any model relationships that should be included when querying the table data.
+
+```php
+protected function setRelations(): void
+{
+    $this->relations = ['relationName'];
+}
+```
+### setSearchable()
+Determine which columns can be searched. This method sets the $searchable array with the names of the columns.
+
+```php
+protected function setSearchable(): void
+{
+    $this->searchable = ['column1', 'column2'];
+}
+```
+### setSortable()
+Define which columns can be sorted. This method sets the $sortable array with the names of the sortable columns.
+
+```php
+protected function setSortable(): void
+{
+    $this->sortable = ['column1', 'column2'];
+}
+```
+
+### setExcludedColumns()
+
+```php
+protected function setExcludedColumns(): void
+{
+    $this->excludedColumns = ['column1', 'column2'];
+}
+```
+### setHiddenColumns()
+Hide specific columns from the table output. This method sets the $hiddenColumns array.
+
+```php
+protected function setHiddenColumns(): void
+{
+    $this->hiddenColumns = ['column1', 'column2'];
+}
+```
+
+### setColumnOrder()
+Determine the order in which columns appear in the table. This method sets the $columnOrder array.
+
+```php
+protected function setColumnOrder(): void
+{
+    $this->columnOrder = ['column1', 'column2'];
+}
+```
+--------------
+### applyCustomQueryConditions(Builder $query, Request $request)
+Apply custom conditions to the table query. This method allows you to modify the Eloquent query builder instance with additional conditions.
+
+``` php
+protected function applyCustomQueryConditions(Builder $query, Request $request): void
+{
+    $query->where('status',1);
+}
+``` 
 
 ## Custom Table Columns
 
