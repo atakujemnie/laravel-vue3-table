@@ -71,6 +71,67 @@ export default {
 </script>
 ```
 
+## Custom Table Columns
+
+### Creating Custom Columns
+
+To enhance the functionality of your tables with custom columns, you can define additional data that goes beyond the default model attributes. These custom columns can be used to display computed values, aggregate information, or options like edit links.
+
+Here's how you can define custom columns in your `TableService` subclass:
+
+```php
+protected function getAdditionalColumns(): void
+{
+    $this->additionalColumns = [
+        [
+            'name' => 'eans',
+            'label' => 'EANs',
+            'sortable' => false,
+            'searchable' => false,
+            'additional' => true,
+            'contentQuery' => [$this, 'getEANsForProduct']
+        ],
+        [
+            'name' => 'edit',
+            'label' => 'Edit',
+            'sortable' => false,
+            'searchable' => false,
+            'additional' => true
+        ],
+        // Add more custom columns as needed
+    ];
+}
+
+
+## Implementing Content Queries
+For each custom column that requires additional data from the backend, you should implement a corresponding method that retrieves this data. Here's an example for the eans custom column:
+
+```php
+protected function getEANsForProduct($productId)
+{
+    $product = Product::find($productId);
+    return $product ? $product->variants->pluck('ean') : null;
+}
+```
+
+Displaying Custom Columns in the Frontend
+In your frontend Vue.js component, you can utilize slots to render the content of custom columns. Below is an example of how you could display the eans and edit custom columns:
+
+```vue
+<template v-slot:column-extra="{ column, item }">
+    <div v-if="column.name === 'edit'">
+        <a :href="'/edit/' + item.id">Edit</a>
+    </div>
+    <div v-if="column.name === 'eans'">
+        <span v-for="ean in item.eans" :key="ean">{{ ean }}</span>
+    </div>
+</template>
+```
+
+Make sure to use the correct column names and data properties that match your backend configuration.
+
+Conclusion
+Custom columns allow for a highly flexible and dynamic table that can fit the unique needs of your application. With custom content queries and the power of Vue.js slots, you can easily add and display any type of data in your tables.
 
 ## Contributing
 Contributions are welcome and will be fully credited. Please see CONTRIBUTING for details.
