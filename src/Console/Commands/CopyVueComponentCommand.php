@@ -13,22 +13,34 @@ class CopyVueComponentCommand extends Command
 
     public function handle()
     {
-        $path = $this->option('path') ?: resource_path('js/components');
-        $sourcePath = __DIR__ . '/../../resources/js/components/ApiTable.vue';
-        $destinationPath = $path . '/ApiTable.vue';
+        $baseSourcePath = __DIR__ . '/../../resources/js/LaravelVueTable';
+        $baseDestinationPath = resource_path('js/components/LaravelVueTable');
 
-        if (!File::exists($sourcePath)) {
-            $this->error("Source component does not exist.");
-            return;
+        $componentsToCopy = [
+            '/Table.vue',
+            '/TableElements/TableSortIcon.vue'
+        ];
+
+        foreach ($componentsToCopy as $componentPath) {
+            $sourcePath = $baseSourcePath . $componentPath;
+            $destinationPath = $baseDestinationPath . $componentPath;
+
+            if (!File::exists($sourcePath)) {
+                $this->error("Source component does not exist: {$sourcePath}");
+                continue;
+            }
+
+            if (!File::isDirectory(dirname($destinationPath))) {
+                File::makeDirectory(dirname($destinationPath), 0755, true);
+            }
+
+            if (File::exists($destinationPath)) {
+                $this->error("Component already exists at the destination: {$destinationPath}");
+                continue;
+            }
+
+            File::copy($sourcePath, $destinationPath);
+            $this->info("Component copied to: {$destinationPath}");
         }
-
-        if (File::exists($destinationPath)) {
-            $this->error("Component already exists at the destination.");
-            return;
-        }
-
-        File::copy($sourcePath, $destinationPath);
-
-        $this->info("Component copied to: {$destinationPath}");
     }
 }

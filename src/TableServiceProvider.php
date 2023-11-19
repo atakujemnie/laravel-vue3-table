@@ -25,7 +25,8 @@ class TableServiceProvider extends ServiceProvider
         }
         // Publikuj komponent Vue, aby był dostępny w aplikacji
         $this->publishes([
-            __DIR__ . '/../resources/js/components/ApiTable.vue' => resource_path('js/components/ApiTable.vue'),
+            __DIR__ . '/../resources/js/components/LaravelVueTable/Table.vue' => resource_path('js/components/LaravelVueTable/Table.vue'),
+            __DIR__ . '/../resources/js/LaravelVueTable/components/TableElements/TableSortIcon.vue' => resource_path('js/components/LaravelVueTable/TableElements/TableSortIcon.vue'),
         ], 'laravel-vue3-table-components');
     }
 
